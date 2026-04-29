@@ -1,0 +1,783 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>老乞丐 WxPusher 订阅中心</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #18211c;
+      --muted: #66736d;
+      --line: #dde5e0;
+      --paper: #f7faf8;
+      --surface: #ffffff;
+      --accent: #1c8f5a;
+      --accent-dark: #0d6840;
+      --soft: #e9f4ee;
+      --warn: #a05a18;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+      background:
+        radial-gradient(circle at top right, rgba(28, 143, 90, 0.14), transparent 34rem),
+        linear-gradient(180deg, #fbfdfb 0%, var(--paper) 42%, #eef5f1 100%);
+      color: var(--ink);
+      letter-spacing: 0;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .page {
+      min-height: 100svh;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+      gap: clamp(28px, 5vw, 72px);
+      align-items: center;
+      width: min(1160px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: clamp(34px, 7vw, 86px) 0 28px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--accent-dark);
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 22px;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      background: var(--accent);
+      color: white;
+      font-weight: 800;
+      box-shadow: 0 18px 42px rgba(28, 143, 90, 0.24);
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 780px;
+      font-size: clamp(42px, 7vw, 84px);
+      line-height: 0.98;
+      font-weight: 850;
+    }
+
+    .lead {
+      max-width: 680px;
+      margin: 22px 0 0;
+      color: var(--muted);
+      font-size: clamp(16px, 2vw, 20px);
+      line-height: 1.7;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .primary,
+    .secondary,
+    .copy {
+      min-height: 44px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      padding: 0 16px;
+      cursor: pointer;
+      transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+    }
+
+    .primary {
+      background: var(--accent);
+      color: white;
+      font-weight: 700;
+      box-shadow: 0 16px 34px rgba(28, 143, 90, 0.22);
+    }
+
+    .secondary {
+      background: transparent;
+      border-color: var(--line);
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .primary:hover,
+    .secondary:hover,
+    .copy:hover {
+      transform: translateY(-1px);
+    }
+
+    .visual {
+      position: relative;
+      min-height: 320px;
+      border-left: 1px solid var(--line);
+      padding-left: clamp(24px, 4vw, 52px);
+      animation: rise 700ms ease both;
+    }
+
+    .phone {
+      width: min(320px, 100%);
+      margin-left: auto;
+      aspect-ratio: 0.62;
+      border-radius: 32px;
+      background: #111c17;
+      padding: 14px;
+      box-shadow: 0 28px 70px rgba(21, 33, 28, 0.28);
+      transform: rotate(2deg);
+    }
+
+    .screen {
+      height: 100%;
+      border-radius: 24px;
+      background: linear-gradient(160deg, #effaf3, #ffffff 46%, #dff0e8);
+      padding: 22px 18px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .wechat-dot {
+      width: 58px;
+      height: 58px;
+      border-radius: 18px;
+      background: var(--accent);
+      color: white;
+      display: grid;
+      place-items: center;
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 24px;
+    }
+
+    .screen-line {
+      height: 12px;
+      border-radius: 999px;
+      background: #d5e7de;
+      margin: 14px 0;
+    }
+
+    .screen-line.short {
+      width: 58%;
+    }
+
+    .screen-list {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 22px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .screen-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 42px;
+      padding: 0 12px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid rgba(28, 143, 90, 0.16);
+      color: #305244;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      backdrop-filter: blur(18px);
+      background: rgba(247, 250, 248, 0.84);
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .toolbar-inner {
+      width: min(1160px, calc(100% - 40px));
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) auto;
+      gap: 16px;
+      align-items: center;
+      padding: 14px 0;
+    }
+
+    .search {
+      width: 100%;
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--ink);
+      padding: 0 14px;
+      outline: none;
+    }
+
+    .search:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(28, 143, 90, 0.1);
+    }
+
+    .filters {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    .filter {
+      white-space: nowrap;
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--muted);
+      padding: 0 12px;
+      cursor: pointer;
+    }
+
+    .filter.active {
+      color: white;
+      background: var(--ink);
+      border-color: var(--ink);
+    }
+
+    main {
+      width: min(1160px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 34px 0 68px;
+    }
+
+    .notice {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      padding: 18px 0;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .notice strong {
+      color: var(--ink);
+    }
+
+    .sections {
+      display: grid;
+      gap: 34px;
+      margin-top: 34px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 14px;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: clamp(24px, 3vw, 34px);
+    }
+
+    .count {
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .item {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      min-height: 88px;
+      border-top: 1px solid var(--line);
+      padding: 16px 0;
+      animation: fade 360ms ease both;
+    }
+
+    .item-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .tag {
+      min-width: 42px;
+      min-height: 28px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 7px;
+      background: var(--soft);
+      color: var(--accent-dark);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .link-text {
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .copy {
+      background: var(--surface);
+      border-color: var(--line);
+      color: var(--ink);
+      font-weight: 700;
+      min-width: 72px;
+    }
+
+    .open {
+      display: inline-grid;
+      place-items: center;
+      min-height: 44px;
+      min-width: 82px;
+      border-radius: 8px;
+      background: var(--accent);
+      color: white;
+      font-weight: 800;
+      text-decoration: none;
+      transition: transform 160ms ease, background 160ms ease;
+    }
+
+    .open:hover {
+      transform: translateY(-1px);
+      background: var(--accent-dark);
+    }
+
+    .empty {
+      display: none;
+      padding: 48px 0;
+      color: var(--muted);
+      text-align: center;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 22px;
+      transform: translateX(-50%) translateY(120%);
+      background: var(--ink);
+      color: white;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-weight: 700;
+      box-shadow: 0 18px 42px rgba(24, 33, 28, 0.22);
+      transition: transform 220ms ease;
+      z-index: 20;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fade {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 920px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .visual {
+        min-height: auto;
+        border-left: 0;
+        border-top: 1px solid var(--line);
+        padding: 24px 0 0;
+      }
+
+      .phone {
+        margin: 0;
+        width: min(280px, 82vw);
+      }
+
+      .toolbar-inner {
+        grid-template-columns: 1fr;
+      }
+
+      .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 620px) {
+      .hero,
+      .toolbar-inner,
+      main {
+        width: min(100% - 28px, 1160px);
+      }
+
+      .hero {
+        padding-top: 28px;
+      }
+
+      .hero-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      .notice,
+      .section-head {
+        display: block;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .item {
+        grid-template-columns: 1fr;
+      }
+
+      .actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <section class="hero">
+      <div>
+        <div class="brand"><span class="brand-mark">W</span><span>老乞丐 WxPusher</span></div>
+        <h1>选择区服，订阅提醒。</h1>
+        <p class="lead">每个区服对应一个 WxPusher Topic。打开订阅链接后，按页面提示关注即可接收该区服的老乞丐提醒。</p>
+        <div class="hero-actions">
+          <button class="primary" type="button" data-scroll="#subscriptions">查看全部区服</button>
+          <button class="secondary" type="button" id="copyAll">复制全部链接</button>
+        </div>
+      </div>
+      <div class="visual" aria-hidden="true">
+        <div class="phone">
+          <div class="screen">
+            <div class="wechat-dot">订</div>
+            <div class="screen-line"></div>
+            <div class="screen-line short"></div>
+            <div class="screen-list">
+              <div class="screen-item"><span>官方1区</span><span>已订阅</span></div>
+              <div class="screen-item"><span>H5暴走1区</span><span>提醒中</span></div>
+              <div class="screen-item"><span>苹果1区</span><span>可加入</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="toolbar">
+      <div class="toolbar-inner">
+        <input id="search" class="search" type="search" placeholder="搜索区服，例如 g1、混服10、h5_3、暴走" autocomplete="off">
+        <div class="filters" role="tablist" aria-label="区服分类">
+          <button class="filter active" type="button" data-filter="all">全部</button>
+          <button class="filter" type="button" data-filter="official">官方</button>
+          <button class="filter" type="button" data-filter="mixed">混服</button>
+          <button class="filter" type="button" data-filter="apple">苹果</button>
+          <button class="filter" type="button" data-filter="h5">H5</button>
+          <button class="filter" type="button" data-filter="baozou">暴走</button>
+        </div>
+      </div>
+    </div>
+
+    <main id="subscriptions">
+      <div class="notice">
+        <div><strong>给别人用：</strong>直接把这个页面发出去，对方点对应区服的“订阅”即可。</div>
+        <div>不要公开 WxPusher 的 appToken；本页只包含 Topic 订阅链接。</div>
+      </div>
+
+      <div class="sections" id="sections"></div>
+      <div class="empty" id="empty">没有找到匹配的区服。</div>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite">已复制</div>
+
+  <script>
+    const TOPICS = {
+      g1: 44234,
+      g2: 44235,
+      g3: 44236,
+      h1: 44237,
+      h2: 44238,
+      h3: 44239,
+      h4: 44240,
+      h5: 44241,
+      h6: 44242,
+      h7: 44243,
+      h8: 44244,
+      h9: 44245,
+      h10: 44246,
+      h11: 44247,
+      h12: 44248,
+      h13: 44249,
+      h14: 44250,
+      h15: 44251,
+      h16: 44252,
+      h17: 44253,
+      h18: 44254,
+      h19: 44255,
+      h20: 44256,
+      h21: 44257,
+      h22: 44258,
+      h23: 44259,
+      h24: 44260,
+      a1: 44261,
+      h5_1: 44262,
+      h5_2: 44263,
+      h5_3: 44264,
+      h5_4: 44265,
+      h5_5: 44266,
+      h5_6: 44267,
+      h5_7: 44268,
+      h5_8: 44269,
+      h5_9: 44270,
+      h5_10: 44271,
+      h5_11: 44272,
+      h5_12: 44273,
+      h5_13: 44274,
+      h5_14: 44275,
+      h5_15: 44276,
+      b1: 44277,
+      b2: 44278,
+      b3: 44279,
+      b4: 44280,
+      b5: 44281,
+      b6: 44282,
+      b7: 44283,
+      b8: 44284,
+      b9: 44285,
+      b10: 44286,
+      b11: 44287,
+      b12: 44288,
+      b13: 44289,
+      b14: 44290,
+      b15: 44291,
+      b16: 44292,
+      b17: 44293,
+      b18: 44294,
+      b19: 44295,
+      b20: 44296,
+      b21: 44297,
+      b22: 44298,
+      b23: 44299,
+      b24: 44300,
+      b25: 44301,
+      b26: 44302
+    };
+
+    const GROUPS = [
+      { id: "official", title: "官方服", match: code => /^g\d+$/.test(code), label: code => `官方${numberPart(code)}区` },
+      { id: "mixed", title: "混服", match: code => /^h\d+$/.test(code), label: code => `混服${numberPart(code)}区` },
+      { id: "apple", title: "苹果服", match: code => /^a\d+$/.test(code), label: code => `苹果${numberPart(code)}区` },
+      { id: "h5", title: "H5 暴走", match: code => /^h5_\d+$/.test(code), label: code => `H5暴走${numberPart(code)}区` },
+      { id: "baozou", title: "暴走服", match: code => /^b\d+$/.test(code), label: code => `暴走${numberPart(code)}区` }
+    ];
+
+    const state = {
+      filter: "all",
+      query: ""
+    };
+
+    function numberPart(code) {
+      const match = code.match(/(\d+)$/);
+      return match ? match[1] : code;
+    }
+
+    function linkFor(topicId) {
+      return `https://wxpusher.zjiecode.com/wxuser/?type=2&id=${topicId}#/follow`;
+    }
+
+    function groupFor(code) {
+      return GROUPS.find(group => group.match(code));
+    }
+
+    function topicRows() {
+      return Object.entries(TOPICS)
+        .map(([code, topicId]) => {
+          const group = groupFor(code);
+          return {
+            code,
+            topicId,
+            groupId: group ? group.id : "other",
+            groupTitle: group ? group.title : "其它",
+            name: group ? group.label(code) : code,
+            link: linkFor(topicId)
+          };
+        })
+        .sort((a, b) => {
+          const ga = GROUPS.findIndex(group => group.id === a.groupId);
+          const gb = GROUPS.findIndex(group => group.id === b.groupId);
+          if (ga !== gb) return ga - gb;
+          return Number(numberPart(a.code)) - Number(numberPart(b.code));
+        });
+    }
+
+    function render() {
+      const sections = document.getElementById("sections");
+      const empty = document.getElementById("empty");
+      const query = state.query.trim().toLowerCase();
+      const rows = topicRows().filter(row => {
+        const inGroup = state.filter === "all" || row.groupId === state.filter;
+        const haystack = `${row.code} ${row.name} ${row.topicId}`.toLowerCase();
+        return inGroup && (!query || haystack.includes(query));
+      });
+
+      sections.innerHTML = "";
+      empty.style.display = rows.length ? "none" : "block";
+
+      const grouped = GROUPS
+        .map(group => ({ ...group, rows: rows.filter(row => row.groupId === group.id) }))
+        .filter(group => group.rows.length);
+
+      for (const group of grouped) {
+        const section = document.createElement("section");
+        section.className = "section";
+        section.dataset.group = group.id;
+
+        const head = document.createElement("div");
+        head.className = "section-head";
+        head.innerHTML = `<h2>${group.title}</h2><span class="count">${group.rows.length} 个 Topic</span>`;
+
+        const grid = document.createElement("div");
+        grid.className = "grid";
+        for (const row of group.rows) {
+          const item = document.createElement("article");
+          item.className = "item";
+          item.innerHTML = `
+            <div>
+              <div class="item-title"><span class="tag">${row.code}</span><span>${row.name}</span></div>
+              <div class="link-text">${row.link}</div>
+            </div>
+            <div class="actions">
+              <button class="copy" type="button" data-link="${row.link}">复制</button>
+              <a class="open" href="${row.link}" target="_blank" rel="noopener">订阅</a>
+            </div>
+          `;
+          grid.appendChild(item);
+        }
+
+        section.appendChild(head);
+        section.appendChild(grid);
+        sections.appendChild(section);
+      }
+    }
+
+    async function copyText(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        return;
+      }
+      const area = document.createElement("textarea");
+      area.value = text;
+      area.style.position = "fixed";
+      area.style.opacity = "0";
+      document.body.appendChild(area);
+      area.select();
+      document.execCommand("copy");
+      area.remove();
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toast.classList.remove("show"), 1800);
+    }
+
+    document.addEventListener("click", async event => {
+      const copyButton = event.target.closest("[data-link]");
+      if (copyButton) {
+        await copyText(copyButton.dataset.link);
+        showToast("订阅链接已复制");
+        return;
+      }
+
+      const filter = event.target.closest("[data-filter]");
+      if (filter) {
+        state.filter = filter.dataset.filter;
+        document.querySelectorAll(".filter").forEach(button => button.classList.toggle("active", button === filter));
+        render();
+        return;
+      }
+
+      const scrollButton = event.target.closest("[data-scroll]");
+      if (scrollButton) {
+        document.querySelector(scrollButton.dataset.scroll).scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    });
+
+    document.getElementById("search").addEventListener("input", event => {
+      state.query = event.target.value;
+      render();
+    });
+
+    document.getElementById("copyAll").addEventListener("click", async () => {
+      const text = topicRows().map(row => `${row.name} (${row.code}): ${row.link}`).join("\n");
+      await copyText(text);
+      showToast("全部订阅链接已复制");
+    });
+
+    render();
+  </script>
+</body>
+</html>
