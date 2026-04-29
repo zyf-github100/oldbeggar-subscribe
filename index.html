@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>老乞丐订阅中心</title>
+  <title>老乞丐推送中心</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23c56a32'/%3E%3Cpath d='M22 24h20M22 32h20M22 40h12' stroke='white' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E">
   <style>
     :root {
@@ -132,6 +132,10 @@
       font-size: clamp(44px, 6.4vw, 78px);
       line-height: 1.02;
       font-weight: 850;
+    }
+
+    h1 span {
+      display: block;
     }
 
     .lead {
@@ -742,8 +746,8 @@
     <section class="hero">
       <div>
         <div class="brand"><span class="brand-mark">乞</span><span>老乞丐提醒</span></div>
-        <h1>按区服订阅微信提醒</h1>
-        <p class="lead">找到自己的区服，打开订阅入口并关注。后续出现提醒时，会自动推送到你的微信。</p>
+        <h1><span>下载软件</span><span>接收推送</span></h1>
+        <p class="lead">找到自己的区服，打开推送入口并完成绑定。后续出现提醒时，会自动推送到你的设备。</p>
         <div class="hero-actions">
           <button class="primary" type="button" data-scroll="#subscriptions">
             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -761,18 +765,18 @@
               <rect x="9" y="9" width="13" height="13" rx="2"></rect>
               <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
             </svg>
-            <span>复制全部订阅</span>
+            <span>复制全部入口</span>
           </button>
         </div>
       </div>
       <div class="visual" aria-hidden="true">
         <div class="phone">
           <div class="screen">
-            <div class="wechat-dot">订</div>
+            <div class="wechat-dot">推</div>
             <div class="screen-line"></div>
             <div class="screen-line short"></div>
             <div class="screen-list">
-              <div class="screen-item"><span>官方1区</span><span>已订阅</span></div>
+              <div class="screen-item"><span>官方1区</span><span>已绑定</span></div>
               <div class="screen-item"><span>H5暴走1区</span><span>可接收</span></div>
               <div class="screen-item"><span>苹果1区</span><span>可加入</span></div>
             </div>
@@ -798,8 +802,8 @@
     <main id="subscriptions">
       <div class="notice">
         <div><strong>按区服查找</strong>官方、混服、苹果、H5、暴走都在这里。</div>
-        <div><strong>一键打开</strong>点“订阅”进入微信订阅页。</div>
-        <div><strong>便于转发</strong>复制单个区服，或一次复制全部订阅入口。</div>
+        <div><strong>一键打开</strong>点“打开”进入软件推送入口。</div>
+        <div><strong>便于转发</strong>复制单个区服，或一次复制全部推送入口。</div>
       </div>
 
       <div class="sections" id="sections"></div>
@@ -977,11 +981,11 @@
           item.innerHTML = `
             <div>
               <div class="item-title"><span class="tag">${row.code}</span><span>${row.name}</span></div>
-              <div class="link-text">微信订阅入口</div>
+              <div class="link-text">软件推送入口</div>
             </div>
             <div class="actions">
               <button class="copy" type="button" data-link="${row.link}">${ICONS.copy}<span>复制</span></button>
-              <a class="open" href="${row.link}" target="_blank" rel="noopener"><span>订阅</span>${ICONS.arrow}</a>
+              <a class="open" href="${row.link}" target="_blank" rel="noopener"><span>打开</span>${ICONS.arrow}</a>
             </div>
           `;
           grid.appendChild(item);
@@ -1020,7 +1024,7 @@
       const copyButton = event.target.closest("[data-link]");
       if (copyButton) {
         await copyText(copyButton.dataset.link);
-        showToast("订阅链接已复制");
+        showToast("推送入口已复制");
         return;
       }
 
@@ -1054,7 +1058,7 @@
     document.getElementById("copyAll").addEventListener("click", async () => {
       const text = topicRows().map(row => `${row.name} (${row.code}): ${row.link}`).join("\n");
       await copyText(text);
-      showToast("全部订阅链接已复制");
+      showToast("全部推送入口已复制");
     });
 
     render();
