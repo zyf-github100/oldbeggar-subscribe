@@ -722,7 +722,7 @@
             <span class="step-index">02</span>
             <span>
               <strong class="step-title">选择区服</strong>
-              <span class="step-text">确认官方、混服、苹果、H5 或暴走区服后打开入口。</span>
+              <span class="step-text">确认官方、混服、苹果、H5、微信小游戏或暴走区服后打开入口。</span>
             </span>
           </div>
           <div class="brief-step">
@@ -738,13 +738,14 @@
 
     <div class="toolbar">
       <div class="toolbar-inner">
-        <input id="search" class="search" type="search" placeholder="搜索区服，例如 g1、混服10、h5_3、暴走" autocomplete="off">
+        <input id="search" class="search" type="search" placeholder="搜索区服，例如 g1、混服10、h5_3、xyx_1、暴走" autocomplete="off">
         <div class="filters" role="tablist" aria-label="区服分类">
           <button class="filter active" type="button" data-filter="all">全部</button>
           <button class="filter" type="button" data-filter="official">官方</button>
           <button class="filter" type="button" data-filter="mixed">混服</button>
           <button class="filter" type="button" data-filter="apple">苹果</button>
           <button class="filter" type="button" data-filter="h5">H5</button>
+          <button class="filter" type="button" data-filter="mini">微信小游戏</button>
           <button class="filter" type="button" data-filter="baozou">暴走</button>
         </div>
       </div>
@@ -752,7 +753,7 @@
 
     <main id="subscriptions">
       <div class="notice">
-        <div><strong>按区服查找</strong>官方、混服、苹果、H5、暴走都在这里。</div>
+        <div><strong>按区服查找</strong>官方、混服、苹果、H5、微信小游戏、暴走都在这里。</div>
         <div><strong>一键打开</strong>点“打开”进入软件推送入口。</div>
         <div><strong>便于转发</strong>复制单个区服，或一次复制全部推送入口。</div>
       </div>
@@ -766,7 +767,7 @@
           </svg>
         </div>
         <h3>未找到相关区服</h3>
-        <p>请尝试输入其他关键词，如 g1、混服10 或暴走。</p>
+        <p>请尝试输入其他关键词，如 g1、混服10、xyx_1 或暴走。</p>
         <button class="empty-reset" type="button" id="clearSearch">清除搜索</button>
       </div>
     </main>
@@ -820,6 +821,13 @@
       h5_14: 44275,
       h5_15: 44276,
       h5_16: 45345,
+      xyx_1: 46080,
+      xyx_2: 46081,
+      xyx_3: 46082,
+      xyx_4: 46083,
+      xyx_5: 46084,
+      xyx_6: 46085,
+      xyx_7: 46086,
       b1: 44277,
       b2: 44278,
       b3: 44279,
@@ -854,6 +862,7 @@
       { id: "mixed", title: "混服", match: code => /^h\d+$/.test(code), label: code => `混服${numberPart(code)}区` },
       { id: "apple", title: "苹果服", match: code => /^a\d+$/.test(code), label: code => `苹果${numberPart(code)}区` },
       { id: "h5", title: "H5 暴走", match: code => /^h5_\d+$/.test(code), label: code => `H5暴走${numberPart(code)}区` },
+      { id: "mini", title: "微信小游戏区", match: code => /^xyx_\d+$/.test(code), label: code => `微信小游戏${numberPart(code)}区` },
       { id: "baozou", title: "暴走服", match: code => /^b\d+$/.test(code), label: code => `暴走${numberPart(code)}区` }
     ];
 
